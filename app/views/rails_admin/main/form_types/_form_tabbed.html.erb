@@ -1,0 +1,40 @@
+<ul class="nav nav-tabs">
+  <% uuid = "#{field.name}_#{field.object_id}_unique_id" %>
+  <% I18n.available_locales.each do |locale| %>
+    <li class="nav-item">
+      <a class="nav-link <%= ( 'active' if locale == I18n.locale ) %> <%= uuid %>" data-toggle="tab" href="#<%= locale %>_<%= uuid %>">
+        <span>
+          <%= locale %>
+        </span>
+      </a>
+    </li>
+  <% end %>
+</ul>
+<div class="tab-content">
+  <%= form.fields_for field.translations_field do |localized_field| %>
+    <% I18n.available_locales.each do |locale| %>
+      <% val = form.object.send("#{field.name}_translations").try(:[], locale.to_s) %>
+      <div class="<%= uuid %> <%= ( 'active' if locale == I18n.locale ) %> fields tab-pane" id="<%= locale %>_<%= uuid %>" style="padding:5px; margin: 0;">
+        <%= localized_field.send field_type, locale, html_attributes.reverse_merge({ :value => val }) %>
+      </div>
+    <% end %>
+  <% end %>
+</div>
+
+
+<script>
+
+    var <%= "#{field.name}#{field.object_id}" %> = (new Date().getTime()) + Math.floor(Math.random()*100000);
+
+    document.querySelectorAll("ul.nav.nav-tabs a.<%= "#{uuid}" %>").forEach(function(e){
+        console.log(e.getAttribute("href"));
+        e.href = e.getAttribute("href").replace('_unique_id', <%= "#{field.name}#{field.object_id}" %>);
+        e.classList.remove('<%= "#{uuid}" %>');
+    });
+
+    document.querySelectorAll(".tab-content .<%= "#{uuid}" %>").forEach(function(e){
+        e.id = e.id.replace('_unique_id',<%= "#{field.name}#{field.object_id}" %>);
+        e.classList.remove('<%= "#{uuid}" %>');
+    });
+
+</script>
